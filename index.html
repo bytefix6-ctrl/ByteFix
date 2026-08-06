@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ByteFix — Servicio técnico de PC y notebooks en Mendoza</title>
+  <meta name="description" content="Diagnóstico, formateo, instalación de SSD y reparación de PC y notebooks en Mendoza. Te decimos qué tiene tu equipo antes de tocar un tornillo.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ===== RESET & VARIABLES ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    :root {
+      --bg: #121417;
+      --panel: #1A1D22;
+      --panel-2: #20242B;
+      --border: rgba(255,255,255,.08);
+      --border-strong: rgba(255,255,255,.14);
+      --text: #ECEEF0;
+      --text-dim: #98A0AB;
+      --copper: #E3963E;
+      --copper-text: #F0A55A;
+      --ok: #5FD9B4;
+      --warn: #F2C14E;
+      --fail: #FF6E6E;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+    img, svg { display: block; }
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+    button { font: inherit; cursor: pointer; }
+
+    /* ===== UTILITY ===== */
+    .container {
+      width: 100%;
+      max-width: 1180px;
+      margin-inline: auto;
+      padding-inline: 24px;
+    }
+    .section {
+      padding: 100px 0;
+    }
+    @media (max-width: 760px) {
+      .section { padding: 72px 0; }
+    }
+    .section-header {
+      margin-bottom: 56px;
+      max-width: 640px;
+    }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--copper-text);
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .eyebrow::before {
+      content: '';
+      width: 20px;
+      height: 1px;
+      background: var(--copper);
+      display: inline-block;
+    }
+    h1, h2, h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+    h2 {
+      font-size: clamp(28px, 4vw, 40px);
+    }
+    .lead {
+      color: var(--text-dim);
+      font-size: 18px;
+      max-width: 54ch;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      border: 1px solid transparent;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, color .18s ease;
+    }
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+    .btn--primary {
+      background: var(--copper);
+      color: #14161A;
+    }
+    .btn--primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px -10px rgba(227,150,62,.55);
+    }
+    .btn--outline {
+      border-color: var(--border-strong);
+      color: var(--text);
+    }
+    .btn--outline:hover {
+      border-color: var(--copper);
+      color: var(--copper-text);
+      transform: translateY(-2px);
+    }
+    .btn:focus-visible {
+      outline: 2px solid var(--copper-text);
+      outline-offset: 3px;
+    }
+
+    /* ===== NAV ===== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(18,20,23,.82);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-block: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: var(--panel-2);
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--copper-text);
+    }
+    .logo-mark svg {
+      width: 18px;
+      height: 18px;
+    }
+    .logo b {
+      color: var(--copper-text);
+      font-weight: 700;
+    }
+    .nav-links {
+      display: flex;
+      gap: 34px;
+      font-size: 15px;
+      color: var(--text-dim);
+    }
+    .nav-links a:hover {
+      color: var(--text);
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+    }
+    .nav-toggle svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    @media (max-width: 760px) {
+      .nav-links {
+        position: fixed;
+        top: 65px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        gap: 20px;
+        background: var(--panel);
+        border-bottom: 1px solid var(--border);
+        padding: 24px;
+        transform: translateY(-10px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .22s ease, transform .22s ease;
+      }
+      .nav.open .nav-links {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+      }
+      .nav-toggle {
+        display: inline-flex;
+      }
+      .nav-right .btn span {
+        display: none;
+      }
+      .nav-right .btn {
+        padding: 12px;
+      }
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding-block: 88px;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image: radial-gradient(rgba(227,150,62,.16) 1px, transparent 1px);
+      background-size: 28px 28px;
+      -webkit-mask-image: linear-gradient(to bottom, black, transparent 82%);
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+      opacity: .55;
+    }
+    .hero-grid {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 48px;
+      max-width: 760px;
+      margin-inline: auto;
+    }
+    .hero h1 {
+      font-size: clamp(34px, 5.2vw, 54px);
+      margin-block: 18px 20px;
+    }
+    .hero .lead {
+      margin-bottom: 34px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* ===== SERVICES ===== */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .service-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px;
+      transition: border-color .2s ease, transform .2s ease;
+    }
+    .service-card:hover {
+      border-color: var(--copper);
+      transform: translateY(-3px);
+    }
+    .service-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .service-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--panel-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--copper-text);
+    }
+    .service-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+    .service-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: .05em;
+    }
+    .service-card h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .service-card p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+    }
+    .service-price {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      color: var(--copper-text);
+      font-weight: 600;
+      margin-top: 12px;
+      display: block;
+    }
+
+    /* ===== STEPS ===== */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 28px;
+    }
+    @media (max-width: 900px) {
+      .steps {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+    }
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--copper-text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+    .step h3 {
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+    .step p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+    }
+
+    /* ===== CONTACT ===== */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 48px;
+      align-items: start;
+    }
+    @media (max-width: 860px) {
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .contact-card {
+      background: var(--panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 8px 28px;
+    }
+    .contact-row {
+      display: flex;
+      gap: 14px;
+      padding-block: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+    .contact-row:last-child {
+      border-bottom: none;
+    }
+    .contact-row .ic {
+      width: 20px;
+      height: 20px;
+      color: var(--copper-text);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .contact-row h4 {
+      font-size: 14px;
+      margin-bottom: 3px;
+    }
+    .contact-row p, .contact-row a {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+    .contact-row a:hover {
+      color: var(--text);
+    }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 26px 0;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+
+    /* ===== REVEAL ===== */
+    .reveal {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.show {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="container nav-inner">
+    <a href="#top" class="logo">
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h6v6H9z"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>
+      </span>
+      Byte<b>Fix</b>
+    </a>
+    <nav class="nav-links" aria-label="Navegación principal">
+      <a href="#servicios">Servicios</a>
+      <a href="#proceso">Cómo trabajamos</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="nav-right">
+      <a class="btn btn--primary" href="https://ig.me/m/bytefix.mdz" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        <span>Escribinos</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="container hero-grid">
+      <div>
+        <span class="eyebrow">Servicio técnico · Mendoza</span>
+        <h1>Primero el diagnóstico.<br>Después el arreglo.</h1>
+        <p class="lead">Reparación y mantenimiento de PC y notebooks. Revisamos el equipo, te contamos qué tiene y recién ahí movemos un tornillo.</p>
+        <div class="hero-actions">
+          <a class="btn btn--primary" href="https://ig.me/m/bytefix.mdz" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            Pedir diagnóstico
+          </a>
+          <a class="btn btn--outline" href="#servicios">
+            Ver servicios
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="section" id="servicios">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow">Qué hacemos</span>
+        <h2>Servicios y precios</h2>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card reveal">
+          <div class="service-top">
+            <span class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="14" height="10" rx="1"/><line x1="6" y1="18" x2="12" y2="18"/><line x1="9" y1="14" x2="9" y2="18"/><circle cx="17.5" cy="15.5" r="3.5"/><line x1="20" y1="18" x2="22" y2="20"/></svg>
+            </span>
+            <span class="service-code">BF-01</span>
+          </div>
+          <h3>Formateo e instalación de Sistema Operativo</h3>
+          <p>Instalación limpia del sistema operativo, activación y configuración básica.</p>
+          <span class="service-price">$ 40.000,00</span>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-top">
+            <span class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>
+            </span>
+            <span class="service-code">BF-02</span>
+          </div>
+          <h3>Inicialización de equipo nuevo</h3>
+          <p>Configuración inicial + instalación de programas básicos para que arranques sin problemas.</p>
+          <span class="service-price">$ 20.000,00</span>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-top">
+            <span class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.6"/><path d="M12 10.4c-1-2.2-.6-4.4 1-6 1.6 1 2.2 3.2 1 5.4"/><path d="M13.6 12c2.2-1 4.4-.6 6 1-1 1.6-3.2 2.2-5.4 1"/><path d="M12 13.6c1 2.2.6 4.4-1 6-1.6-1-2.2-3.2-1-5.4"/><path d="M10.4 12c-2.2 1-4.4.6-6-1 1-1.6 3.2-2.2 5.4-1"/></svg>
+            </span>
+            <span class="service-code">BF-03</span>
+          </div>
+          <h3>Limpieza de hardware + Pasta térmica</h3>
+          <p>Limpieza profunda de polvo y cambio de pasta térmica para mejorar la refrigeración.</p>
+          <span class="service-price">$ 41.000,00</span>
+        </div>
+
+        <div class="service-card reveal">
+          <div class="service-top">
+            <span class="service-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v10"/><path d="M8 9l4 4 4-4"/><path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+            </span>
+            <span class="service-code">BF-04</span>
+          </div>
+          <h3>Instalación y configuración de Drivers</h3>
+          <p>Actualización e instalación de todos los drivers necesarios para el funcionamiento óptimo.</p>
+          <span class="service-price">$ 10.000,00</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="section" id="proceso" style="background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="eyebrow">Cómo trabajamos</span>
+        <h2>De la consulta al equipo andando</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">01</div>
+          <h3>Contanos qué pasa</h3>
+          <p>Por WhatsApp nos contás el problema o coordinás para traer el equipo.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">02</div>
+          <h3>Diagnóstico</h3>
+          <p>Revisamos el equipo y te confirmamos qué tiene y qué necesita, sin sorpresas.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">03</div>
+          <h3>Presupuesto</h3>
+          <p>Te pasamos el costo antes de arrancar. Vos decidís si seguimos.</p>
+        </div>
+        <div class="step reveal">
+          <div class="step-num">04</div>
+          <h3>Reparación y entrega</h3>
+          <p>Hacemos el trabajo y te avisamos apenas está listo para retirar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO (modificado: sin email, horario = "Coordinamos por privado") -->
+  <section class="section" id="contacto" style="background:var(--panel);border-top:1px solid var(--border);">
+    <div class="container contact-grid">
+      <div class="reveal">
+        <span class="eyebrow">Contacto</span>
+        <h2>¿Arrancamos?</h2>
+        <p class="lead" style="margin-block:18px 30px;">Contanos qué le pasa a tu equipo y te respondemos a la brevedad. El diagnóstico no tiene costo.</p>
+        <a class="btn btn--primary" href="https://ig.me/m/bytefix.mdz" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Escribir por Instagram
+        </a>
+      </div>
+
+      <div class="contact-card reveal">
+        <!-- Se eliminó la fila de Email -->
+        <div class="contact-row">
+          <span class="ic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.5 7-12a7 7 0 1 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          </span>
+          <div>
+            <h4>Ubicación</h4>
+            <p>Mendoza, Argentina</p>
+          </div>
+        </div>
+        <div class="contact-row">
+          <span class="ic" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          </span>
+          <div>
+            <h4>Horario</h4>
+            <p>Coordinamos por privado</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <span>© 2026 ByteFix — Servicio técnico en Mendoza</span>
+    <span>Diagnóstico · Formateo · Componentes</span>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.reveal');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduceMotion) {
+    revealEls.forEach(el => el.classList.add('show'));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('show');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: .15 });
+    revealEls.forEach(el => io.observe(el));
+  }
+
+  // Mobile nav
+  const nav = document.getElementById('nav');
+  const navToggle = document.getElementById('navToggle');
+  navToggle.addEventListener('click', () => {
+    const isOpen = nav.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', isOpen);
+  });
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.addEventListener('click', () => {
+      nav.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', false);
+    });
+  });
+</script>
+
+</body>
+</html>
